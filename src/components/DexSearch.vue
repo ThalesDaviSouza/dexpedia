@@ -1,3 +1,4 @@
+<!-- TODO: Fazer esse componente ser respansivo -->
 <template>
     <h1>
         <slot></slot>
@@ -11,7 +12,7 @@
                 </button>
             </div>
             <div>
-                <span class="search-count">(NumResults) resultados para "(pesquisa)"</span>
+                <span v-if="searchOptions.response" class="search-count">{{ searchOptions.resultsCount }} resultados para "{{ searchOptions.searchDisplay }}"</span>
                 <div class="search-options">
                     <div>
                         <span>Ordenar por </span>
@@ -22,9 +23,10 @@
                     </div>
                     <div>
                         <span>Mostrando por página </span>
-                        <select>
+                        <select v-model="searchOptions.maxResults">
                             <option value="20">20</option>
                             <option value="40">40</option>
+                            <option value="60">60</option>
                         </select>
                     </div>
                     <div class="choose-page">
@@ -53,22 +55,31 @@ const props = defineProps({
 
 const searchOptions = reactive({
     search: '',
-    
+    maxResults: 20,
+    resultsCount: '',
+    searchDisplay: '',
+    response: null
 })
 
 const search = () => {
     fetch(props.endpoint)
     .then(res => res.json())
-    .then(res => res.results = res.results.filter(poke => poke.name.includes(searchOptions.search)))
+    .then(res => {
+        res.results = res.results.filter(poke => poke.name.includes(searchOptions.search));
+        
+        searchOptions.resultsCount = res.results.length;
+        searchOptions.searchDisplay = searchOptions.search;
+        res.results = res.results.slice(0, searchOptions.maxResults);
+        searchOptions.response = res.results;
+
+        return res.results;
+    })
     .then(res => emit('search', res))
 };
 
 </script>
 
 <style scoped>
-.search-wrapper{
-    margin: 0 20px;
-}
 .search {
     display: flex;
     flex-direction: row;
@@ -81,16 +92,6 @@ const search = () => {
 }
 .search>input{
     width: 80%;
-}
-.search>button{
-    background-color: var(--main-yellow);
-    margin-left: 10px;
-    border-radius: 20%;
-    font-size: 16px;
-}
-.search>button:hover{
-    background-color: lightyellow;
-    cursor: pointer;
 }
 
 .search-count{
