@@ -16,23 +16,62 @@
                 <div class="search-options">
                     <div>
                         <span>Ordenar por </span>
-                        <select>
-                            <option value="a-z">A-Z</option>
-                            <option value="z-a">Z-A</option>
+                        <select v-model="searchOptions.orderBy">
+                            <option value="0"></option>
+                            <option value="1">A-Z</option>
+                            <option value="2">Z-A</option>
                         </select>
                     </div>
                     <div>
                         <span>Mostrando por página </span>
-                        <select v-model="searchOptions.maxResults">
+                        <select v-model="searchOptions.maxResults" @change="search">
                             <option value="20">20</option>
                             <option value="40">40</option>
                             <option value="60">60</option>
                         </select>
                     </div>
-                    <div class="choose-page">
-                        <Icon icon="mingcute:left-fill" />
-                        <span>1</span>
-                        <Icon icon="mingcute:right-fill" />
+                    <div  v-if="searchOptions.response">
+                        <div class="choose-page" v-if="numPages <= 5">
+                            <Icon v-if="searchOptions.actualPage !== 1" icon="mingcute:left-fill" @click="changePage(searchOptions.actualPage - 1)" />
+                            <span @click="changePage(i)" v-for="i in numPages" :class="{ 'page-selected' : i == searchOptions.actualPage }">{{ i }}</span>
+                            <Icon v-if="searchOptions.actualPage !== numPages" icon="mingcute:right-fill" @click="changePage(searchOptions.actualPage + 1)" />
+                        </div>
+                        <div class="choose-page" v-else-if="searchOptions.actualPage <= 3">
+                            <Icon v-if="searchOptions.actualPage !== 1" icon="mingcute:left-fill" @click="changePage(searchOptions.actualPage - 1)" />
+                            <span v-for="i in 5" @click="changePage(i)" :class="{ 'page-selected' : i == searchOptions.actualPage }">{{ i }}</span>
+                            <span>...</span>
+                            <span @click="changePage(numPages)">{{ numPages }}</span>
+                            <Icon v-if="searchOptions.actualPage !== numPages" icon="mingcute:right-fill" @click="changePage(searchOptions.actualPage + 1)" />
+                        </div>
+                        <div class="choose-page" v-else-if="numPages - searchOptions.actualPage <= 3 ">
+                            <Icon v-if="searchOptions.actualPage !== 1" icon="mingcute:left-fill" @click="changePage(searchOptions.actualPage - 1)" />
+                            <span @click="changePage(1)">1</span>
+                            <span>...</span>
+                            <span 
+                                v-for="i in (3 + (numPages - searchOptions.actualPage))"
+                                v-if="!((i + (searchOptions.actualPage - 3)) >= numPages)" 
+                                @click="changePage(i + (searchOptions.actualPage - 3))" 
+                                :class="{ 'page-selected' : (i + (searchOptions.actualPage - 3)) == searchOptions.actualPage }"
+                            >
+                                    {{ i + (searchOptions.actualPage - 3) }}
+                            </span>
+                            <Icon v-if="searchOptions.actualPage !== numPages" icon="mingcute:right-fill" @click="changePage(searchOptions.actualPage + 1)" />
+                        </div>
+                        <div class="choose-page" v-else>
+                            <Icon v-if="searchOptions.actualPage !== 1" icon="mingcute:left-fill" @click="changePage(searchOptions.actualPage - 1)" />
+                            <span @click="changePage(1)">1</span>
+                            <span>...</span>
+                            <span 
+                                v-for="i in 5" 
+                                @click="changePage(i + (searchOptions.actualPage - 3))" 
+                                :class="{ 'page-selected' : (i + (searchOptions.actualPage - 3)) == searchOptions.actualPage }"
+                            >
+                                {{ i + (searchOptions.actualPage - 3) }}
+                            </span>
+                            <span>...</span>
+                            <span @click="changePage(numPages)">{{ numPages }}</span>
+                            <Icon v-if="searchOptions.actualPage !== numPages" icon="mingcute:right-fill" @click="changePage(searchOptions.actualPage + 1)" />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -42,7 +81,7 @@
 
 <script setup>
 import { Icon } from '@iconify/vue';
-import { reactive } from 'vue';
+import { computed, nextTick, reactive } from 'vue';
 
 const emit = defineEmits(['search']);
 
@@ -56,12 +95,43 @@ const props = defineProps({
 const searchOptions = reactive({
     search: '',
     maxResults: 20,
+    actualPage: 1,
+    orderBy: '',
     resultsCount: '',
     searchDisplay: '',
     response: null
 })
 
+const numPages = computed(() => Math.ceil(parseInt(searchOptions.resultsCount) / parseInt(searchOptions.maxResults)))
+
+function ordemAlfabetica(a, b) {
+  const nomeA = a.name.toLowerCase();
+  const nomeB = b.name.toLowerCase();
+
+  if (nomeA < nomeB) {
+    return -1;
+  }
+  if (nomeA > nomeB) {
+    return 1;
+  }
+  return 0;
+}
+
+function ordemAlfabeticaReversa(a, b) {
+  const nomeA = a.name.toLowerCase();
+  const nomeB = b.name.toLowerCase();
+
+  if (nomeA < nomeB) {
+    return 1;
+  }
+  if (nomeA > nomeB) {
+    return -1;
+  }
+  return 0;
+}
+
 const search = () => {
+    searchOptions.actualPage = 1
     fetch(props.endpoint)
     .then(res => res.json())
     .then(res => {
@@ -69,13 +139,26 @@ const search = () => {
         
         searchOptions.resultsCount = res.results.length;
         searchOptions.searchDisplay = searchOptions.search;
-        res.results = res.results.slice(0, searchOptions.maxResults);
+        
+        searchOptions.orderBy === "1" ? res.results.sort(ordemAlfabetica) : searchOptions.orderBy === "2" ? res.results.sort(ordemAlfabeticaReversa) :  
+
         searchOptions.response = res.results;
+        res.results = res.results.slice(0, searchOptions.maxResults);
 
         return res.results;
     })
     .then(res => emit('search', res))
 };
+
+const changePage = pageNumber => {
+    let res = searchOptions.response.slice(((pageNumber-1) * searchOptions.maxResults), searchOptions.maxResults*pageNumber);
+    
+    emit('search', res);
+    
+    nextTick(() => {
+        searchOptions.actualPage = pageNumber;
+    })
+}
 
 </script>
 
@@ -109,4 +192,12 @@ const search = () => {
     display: flex;
     align-items: center;
 }
+.choose-page>*{
+    margin: 0 3px;
+}
+.choose-page>*:hover{
+    cursor: pointer;
+    color: lightgrey;
+}
+.page-selected{color: lightgray;}
 </style>
