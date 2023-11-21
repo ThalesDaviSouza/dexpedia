@@ -135,7 +135,7 @@ const search = () => {
     fetch(props.endpoint)
     .then(res => res.json())
     .then(res => {
-        res.results = res.results.filter(poke => poke.name.includes(searchOptions.search));
+        res.results = res.results.filter(poke => poke.name.includes(searchOptions.search.toLocaleLowerCase()));
         
         searchOptions.resultsCount = res.results.length;
         searchOptions.searchDisplay = searchOptions.search;

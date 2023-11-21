@@ -90,7 +90,7 @@ fetch(`https://pokeapi.co/api/v2/pokemon/${name}`)
 const upperFirstLetter = str => str[0].toLocaleUpperCase() + str.slice(1);
 
 watch(searchMove, () => {
-    pageStatus.movesToShow = pokeInfo.moves.filter(move => move.move.name.includes(searchMove.value));
+    pageStatus.movesToShow = pokeInfo.moves.filter(move => move.move.name.includes(searchMove.value.toLocaleLowerCase()));
 },
 {
     deep: true
