@@ -139,10 +139,12 @@ const search = () => {
         
         searchOptions.resultsCount = res.results.length;
         searchOptions.searchDisplay = searchOptions.search;
+        searchOptions.response = res.results;
         
         searchOptions.orderBy === "1" ? res.results.sort(ordemAlfabetica) : searchOptions.orderBy === "2" ? res.results.sort(ordemAlfabeticaReversa) :  
+        searchOptions.orderBy === "1" ? searchOptions.response.sort(ordemAlfabetica) : searchOptions.orderBy === "2" ? searchOptions.response.sort(ordemAlfabeticaReversa) :  
 
-        searchOptions.response = res.results;
+        console.log(searchOptions.response)
         res.results = res.results.slice(0, searchOptions.maxResults);
 
         return res.results;
@@ -152,7 +154,7 @@ const search = () => {
 
 const changePage = pageNumber => {
     let res = searchOptions.response.slice(((pageNumber-1) * searchOptions.maxResults), searchOptions.maxResults*pageNumber);
-    
+    console.log(res)
     emit('search', res);
     
     nextTick(() => {
