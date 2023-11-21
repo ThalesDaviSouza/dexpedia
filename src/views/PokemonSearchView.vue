@@ -1,4 +1,5 @@
 <template>
+    <DexBanner />
     <main>
         <DexSearch
             :endpoint="'https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0'"
@@ -16,6 +17,7 @@
 </template>
 
 <script setup>
+import DexBanner from '../components/DexBanner.vue';
 import { reactive } from 'vue';
 import DexCard from '../components/DexCard.vue';
 import DexSearch from '../components/DexSearch.vue';

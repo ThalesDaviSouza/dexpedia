@@ -2,10 +2,9 @@
     <header>
         <h1>Dexpedia</h1>
         <ul>
+            <RouterLink to="/">Inicial</RouterLink>
             <RouterLink to="/pokemonsearch">Pokemon</RouterLink>
-            <RouterLink to="/">Habilidades</RouterLink>
-            <RouterLink to="/">Berries</RouterLink>
-            <RouterLink to="/">Moves</RouterLink>
+            <RouterLink to="/about">Sobre</RouterLink>
         </ul>
     </header>
 </template>

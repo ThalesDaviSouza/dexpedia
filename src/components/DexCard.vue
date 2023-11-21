@@ -1,3 +1,4 @@
+<!-- TODO: Fazer ser responsivo -->
 <template>
     <div class="wrapper">
         <img :src="cardStatus.sprite" alt="Sprite não encontrado">
@@ -7,15 +8,18 @@
                 <span v-for="t in cardStatus.types">{{ t.type.name }}</span>
             </div>
         </div>
-        <button>
-            <Icon icon="ph:eye-fill" />
-        </button>
+        <RouterLink :to="'/pokemon/' + props.pokemonName">
+            <button>
+                <Icon icon="ph:eye-fill" />
+            </button>
+        </RouterLink>
     </div>
 </template>
 
 <script setup>
 import { Icon } from '@iconify/vue';
 import { reactive, watch } from 'vue';
+import { RouterLink } from 'vue-router';
 
 const props = defineProps({
     endpoint: {
