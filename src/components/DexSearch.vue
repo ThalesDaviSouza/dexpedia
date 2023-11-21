@@ -144,7 +144,6 @@ const search = () => {
         searchOptions.orderBy === "1" ? res.results.sort(ordemAlfabetica) : searchOptions.orderBy === "2" ? res.results.sort(ordemAlfabeticaReversa) :  
         searchOptions.orderBy === "1" ? searchOptions.response.sort(ordemAlfabetica) : searchOptions.orderBy === "2" ? searchOptions.response.sort(ordemAlfabeticaReversa) :  
 
-        console.log(searchOptions.response)
         res.results = res.results.slice(0, searchOptions.maxResults);
 
         return res.results;
