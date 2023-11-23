@@ -20,8 +20,8 @@
         <h2>Quem Fez o Quê:</h2>
         <ul>
             <li><strong>Thales Davi:</strong> Cuidou da conexão com a API e da funcionalidade de pesquisa.</li>
-            <li><strong>Gabrielle Maia:</strong> Desenvolveu a interface, tornando-a atraente e fácil de usar.</li>
-            <li><strong>Kaio Fernandes:</strong> Apresentou os dados da API de maneira clara.</li>
+            <li><strong>Kaio Fernandes:</strong> Desenvolveu a interface, tornando-a atraente e fácil de usar.</li>
+            <li><strong>Gabrielle Maia:</strong> Apresentou os dados da API de maneira clara.</li>
         </ul>
     </section>
 
