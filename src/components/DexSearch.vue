@@ -6,7 +6,7 @@
     <section class="wrapper">
         <div class="search-wrapper">
             <div class="search">
-                <input type="text" v-model="searchOptions.search">
+                <input type="text" v-model="searchOptions.search" @keydown="isToSearch">
                 <button @click="search">
                     <Icon icon="tabler:search" />
                 </button>
@@ -151,9 +151,14 @@ const search = () => {
     .then(res => emit('search', res))
 };
 
+const isToSearch = key => {
+    if(key.key == 'Enter')
+        search();
+}
+
 const changePage = pageNumber => {
     let res = searchOptions.response.slice(((pageNumber-1) * searchOptions.maxResults), searchOptions.maxResults*pageNumber);
-    console.log(res)
+
     emit('search', res);
     
     nextTick(() => {
